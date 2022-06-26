@@ -1,4 +1,4 @@
-import java_cup.runtime.*;
+    import java_cup.runtime.*;
 
 %%
 %class Lexico

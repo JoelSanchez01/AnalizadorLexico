@@ -62,7 +62,7 @@ SaltoDeLinea = \n|\r|\r\n
  guionB = \_
  variablePrivada = private
  comparador = &&
-
+puntosolo = \.
 /* Finaliza expresiones regulares */
 
 %%
@@ -74,6 +74,20 @@ SaltoDeLinea = \n|\r|\r\n
 /* Inicia sección de reglas */
 
 // Cada regla está formada por una {expresión} espacio {código}
+
+
+{puntosolo} {
+ TokenPersonalizado t = new TokenPersonalizado(yytext(), "Punto SOlo");
+ this._existenTokens = true;
+ return t;
+}
+
+{comparador} {
+ TokenPersonalizado t = new TokenPersonalizado(yytext(), "comparador");
+ this._existenTokens = true;
+ return t;
+}
+
 
 {comparador} {
  TokenPersonalizado t = new TokenPersonalizado(yytext(), "comparador");

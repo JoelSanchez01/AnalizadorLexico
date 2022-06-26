@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class PruebaJFlex extends JFrame implements ActionListener {
 
@@ -13,16 +15,18 @@ public class PruebaJFlex extends JFrame implements ActionListener {
     private JButton FileB, GyC;
 
     private JScrollPane scroll, scroll2;
-    private JTextArea texto;
+    private JTextArea texto, errores;
     JFileChooser abrirArchivo;
     DefaultTableModel dtm;
     JTable  table;
     String nombre = "";
     String path = "";
-
+    TextLineNumber tln;
+    DateTimeFormatter dtf3;
     PruebaJFlex() {
         setLayout(null);
         setBounds(0, 0, 1050, 500);
+         dtf3 = DateTimeFormatter.ofPattern("HH:mm:ss");
 
         Escoje = new JLabel("Escoja un archivo de texto (.txt) para analizar");
         Escoje.setBounds(580, 20, 400, 20);
@@ -52,8 +56,17 @@ public class PruebaJFlex extends JFrame implements ActionListener {
         texto.setWrapStyleWord(true);
 
         scroll = new JScrollPane();
-        scroll.setBounds(500, 120, 500, 300);
+        scroll.setBounds(500, 120, 500, 150);
         add(scroll);
+        errores = new JTextArea();
+        errores.setBounds(500, 275, 500, 150);
+        add(errores);
+        errores.setEditable(false);
+
+            TextLineNumber tln = new TextLineNumber(texto);
+            scroll2.setRowHeaderView( tln );
+
+
 
 
         dtm = new DefaultTableModel(datos, columnNames){
@@ -88,6 +101,7 @@ public class PruebaJFlex extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == FileB) {
+            analisis.ErroresSintacticos.clear();
             if (abrirArchivo == null) abrirArchivo = new JFileChooser();
             //Con esto solamente podamos abrir archivos
             abrirArchivo.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -113,9 +127,6 @@ public class PruebaJFlex extends JFrame implements ActionListener {
                     throw new RuntimeException(ex);
                 }
 
-
-
-
                 texto.setText(aaa);
 
 
@@ -131,12 +142,23 @@ public class PruebaJFlex extends JFrame implements ActionListener {
                     String contenido = getArchivo(path);
                     Lexico lexico = new Lexico(targetReader);
                      analisis pars = new analisis(lexico);
+
                 try {
                     pars.parse();
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
 
+
+                System.out.println(analisis.ErroresSintacticos.size());
+
+
+                if (analisis.ErroresSintacticos.isEmpty()){
+                    analisis.ErroresSintacticos.add("["+dtf3.format(LocalDateTime.now())+"]:"+"No se encontraron Errores");
+
+                }
+
+                    errores.append(analisis.ErroresSintacticos.get(0)+"\n");
 
             }
 
@@ -145,6 +167,7 @@ public class PruebaJFlex extends JFrame implements ActionListener {
 
         }
         if(e.getSource() == GyC){
+            analisis.ErroresSintacticos.clear();
             File archivo = new File(path); // este es el archivo que insertaras caracteres
             if (!archivo.exists()) {
                 System.out.println("El archivo data no existe.");
@@ -182,7 +205,16 @@ public class PruebaJFlex extends JFrame implements ActionListener {
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-            System.out.println(path);
+
+            System.out.println(analisis.ErroresSintacticos.size());
+
+
+            if (analisis.ErroresSintacticos.isEmpty()){
+                analisis.ErroresSintacticos.add("["+dtf3.format(LocalDateTime.now())+"]:"+"No se encontraron Errores");
+            }
+            errores.append(analisis.ErroresSintacticos.get(0)+"\n");
+
+
         }
     }
 

@@ -1,74 +1,66 @@
 import java_cup.runtime.*;
+import javax.swing.JOptionPane;
+import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 parser code
 {:
     /**
      * Método al que se llama automáticamente ante algún error sintactico.
      **/
+       DateTimeFormatter dtf3 = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+  public static ArrayList<String> ErroresSintacticos=new ArrayList<String>();
+
     public void syntax_error(Symbol s) {
-        System.out.println("Error Sintáctico en la Línea " + (s.left) +
-        " Columna "+s.right+ ". No se esperaba este componente: " +s.value+".");
+             ErroresSintacticos.add("["+dtf3.format(LocalDateTime.now())+"]:"+"Error Sintactico: "+s.value.toString()+" Linea: "+(s.right+1)+"; Y en posicion "+s.right);
+    JOptionPane.showMessageDialog(null, "["+dtf3.format(LocalDateTime.now())+"]:"+"Error Línea "+(s.left+1)+" y en la posicion "+s.right+ ". "+s.value+" No es recconocible.", "Error" , JOptionPane.WARNING_MESSAGE);
+
     }
 
-    /**
-     * Método al que se llama automáticamente ante algún error sintáctico
-     * en el que ya no es posible una recuperación de errores.
-     **/
-    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
-        System.out.println("Error síntactico irrecuperable en la Línea " +
-        (s.left)+ " Columna "+s.right+". Componente " + s.value +
-        " no reconocido.");
-    }
+     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
+            System.out.println("Errores Irrecuperables");
+        }
+
+
+
+
+
 :}
 
 terminal IF, ELSE, SWITCH, CASE, DEFAULT, WHILE, DO, FOR, BREAK, CONTINUE, RETURN, FINAL, BOOLEAN, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, STRING, CHAR, CLASS, THIS, STATIC, NEW, ENUM, ASSERT, NATIVE, VOID, STRICTFP, INTERFACE, IMPLEMENTS, ABSTRACT, EXTENDS, SUPER, CATCH, FINALLY, THROW, THROWS, TRY, SYNCHRONIZED, VOLATILE, TRANSIENT, NULL_LITERAL, PRIVATE, PUBLIC, PROTECTED, PACKAGE, IMPORT, INCREMENT, DECREMENT, LOGICAL_AND, LOGICAL_OR, LOGICAL_NOT, PLUS, MINUS, TIMES, DIVIDE, MODULE, EQUALS, GREATER_EQUALS, SMALLER_EQUALS, GREATER, SMALLER, DIFFERENT, QUOTES, INTERROGATION, BITWISE_NOT, LEFTSHIFT, RIGHTSHIFT, DOUBLE_RIGHTSHIFT, BITWISE_OR, BITWISE_AND, BITWISE_XOR, ASSIGNMENT, PLUS_ASSIGNMENT, MINUS_ASSIGNMENT, TIMES_ASSIGNMENT, DIVIDE_ASSIGNMENT, MODULE_ASSIGNMENT, BITWISE_NOT_ASSIGNMENT, BITWISE_OR_ASSIGNMENT, BITWISE_AND_ASSIGNMENT, BITWISE_XOR_ASSIGNMENT, LEFTSHIFT_ASSIGNMENT, RIGHTSHIFT_ASSIGNMENT, LEFT, RIGHT, LEFT_CURLY, RIGHT_CURLY, LEFT_BRACKET, RIGHT_BRACKET, SEMICOLON, COLON, DOT, COMMA, BOOLEAN_LITERAL, INTEGER_LITERAL, FLOATING_POINT_LITERAL, IDENTIFIER, ERROR, CHARACTER_LITERAL, STRING_LITERAL;
 
 
-// TODO Array initializers
-// TODO Annotations
 
-// The Syntactic Grammar
-nonterminal Goal;
-// Lexical Structure
-nonterminal Literal, Identifier;
-//Types
-nonterminal Type, PrimitiveType, ReferenceType, ArrayType;
-// Names
-nonterminal Name, SimpleName, QualifiedName;
-// Packages
-nonterminal CompilationUnit, TypeDeclaration, TypeDeclarations, ImportDeclaration, ImportDeclarations, PackageDeclaration;
-// Modifiers
-nonterminal Modifiers, Modifier;
-// Classes
-nonterminal ClassDeclaration, ClassDeclarations, Super, ClassBody, ClassMemberDeclaration, ClassMemberDeclarations;
-nonterminal FieldDeclaration, IdentifierList;
+nonterminal Finalizado;
+nonterminal Literal, Identificador;
+
+nonterminal Tipo, TipoPrimitivo, ReferenciaTipo, TipoArreglo;
+nonterminal Nombre, NombreSimple, NombreCualificado;
+nonterminal CompilacionUnida, TipoDeclaracion, TipoDeclaraciones, DeclaracionImport, DeclaracionImports, DeclaracionPackage;
+nonterminal Modificadores, Modificador;
+nonterminal DeclaracionClase, DeclaracionClases, Super, CuerpoClase, DeclaracionMiembrodeClase, DeclaracionMiembrosdeClase;
+nonterminal FieldDeclaration, IdentificadorList;
 nonterminal MethodDeclaration, MethodHeader, MethodDeclarator, FormalParameterList, FormalParameter, Throws, MethodBody;
-// Blocks and Statements
 nonterminal Block, BlockStatement, BlockStatements, LocalVariableDeclarationStatement, LocalVariableDeclaration, VariableDeclarators, VariableDeclarator, Statement, ExpressionStatement, StatementExpression, IfThenStatement, IfThenElseStatement, WhileStatement, DoWhileStatement, ReturnStatement, BreakStatement, ContinueStatement, ForStatement, ForInit, ForUpdate, StatementExpressionList;
-// Expressions
 nonterminal Expression, AssignmentExpression, ConditionalExpression, InfixExpression, InfixOp, PrefixExpression, PrefixOp, PostfixExpression, Suffix, Suffixs, ArrayAccess, Selector, Selectors, FieldAccess, MethodInvocation, ArgumentList, Primary, ClassInstanceCreationExpression, ArrayCreationExpression, Dimension, Dimensions;
 
 
-//***********************************************
-//Precedences
-//***********************************************
 
 precedence left CLASS, PUBLIC, PRIVATE, PROTECTED, STATIC, NATIVE, FINAL, ABSTRACT, TRANSIENT, SYNCHRONIZED, VOLATILE;
 precedence left ELSE, LEFT, LEFT_CURLY, LEFT_BRACKET, DOT;
 precedence left IDENTIFIER;
 
-//***********************************************
-//The Syntactic Grammar
-//***********************************************
-Goal ::= CompilationUnit
+
+//SINTAXIS
+Finalizado ::= CompilacionUnida
 ;
-/***********************************************/
-//Types
-/***********************************************/
-Type ::= PrimitiveType
-    | ReferenceType
+
+Tipo ::= TipoPrimitivo
+    | ReferenciaTipo
 ;
-PrimitiveType ::= INT
+TipoPrimitivo ::= INT
     | BOOLEAN
     | STRING
     | DOUBLE
@@ -79,52 +71,45 @@ PrimitiveType ::= INT
     | BYTE
 ;
 
-//Name ::= Name
-//;
-ArrayType ::= PrimitiveType LEFT_BRACKET RIGHT_BRACKET
-    | Name LEFT_BRACKET RIGHT_BRACKET
-    | ArrayType LEFT_BRACKET RIGHT_BRACKET
+
+TipoArreglo ::= TipoPrimitivo LEFT_BRACKET RIGHT_BRACKET
+    | Nombre LEFT_BRACKET RIGHT_BRACKET
+    | TipoArreglo LEFT_BRACKET RIGHT_BRACKET
 ;
-//***********************************************
-//Names
-//***********************************************
-Name ::= SimpleName
-    | QualifiedName
+
+Nombre ::= NombreSimple
+    | NombreCualificado
 ;
-SimpleName ::= Identifier
+NombreSimple ::= Identificador
 ;
-QualifiedName ::= Name DOT Identifier
+NombreCualificado ::= Nombre DOT Identificador
 ;
-//***********************************************
-//Packages
-//***********************************************
-CompilationUnit ::=
-    | TypeDeclarations
-    | ImportDeclarations TypeDeclarations
-    | PackageDeclaration TypeDeclarations
-    | PackageDeclaration ImportDeclarations TypeDeclarations
+
+CompilacionUnida ::=
+    | TipoDeclaraciones
+    | DeclaracionImports TipoDeclaraciones
+    | DeclaracionPackage TipoDeclaraciones
+    | DeclaracionPackage DeclaracionImports TipoDeclaraciones
 ;
-TypeDeclaration ::= ClassDeclarations
+TipoDeclaracion ::= DeclaracionClases
     | SEMICOLON
 ;
-TypeDeclarations ::= TypeDeclaration
-    | TypeDeclarations TypeDeclaration
+TipoDeclaraciones ::= TipoDeclaracion
+    | TipoDeclaraciones TipoDeclaracion
 ;
-ImportDeclaration ::= IMPORT Name SEMICOLON
-    | IMPORT Name DOT TIMES SEMICOLON
+DeclaracionImport ::= IMPORT Nombre SEMICOLON
+    | IMPORT Nombre DOT TIMES SEMICOLON
 ;
-ImportDeclarations ::= ImportDeclaration
-    | ImportDeclarations ImportDeclaration
+DeclaracionImports ::= DeclaracionImport
+    | DeclaracionImports DeclaracionImport
 ;
-PackageDeclaration ::= PACKAGE Name SEMICOLON
+DeclaracionPackage ::= PACKAGE Nombre SEMICOLON
 ;
-//***********************************************
-//Modifiers
-//***********************************************
-Modifiers ::= Modifier
-    | Modifiers Modifier
+
+Modificadores ::= Modificador
+    | Modificadores Modificador
 ;
-Modifier ::= PUBLIC
+Modificador ::= PUBLIC
     | PRIVATE
     | PROTECTED
     | STATIC
@@ -135,66 +120,62 @@ Modifier ::= PUBLIC
     | SYNCHRONIZED
     | VOLATILE
 ;
-//***********************************************
-//Classes
-//***********************************************
-ClassDeclaration ::= CLASS Identifier ClassBody
-    | CLASS Identifier Super ClassBody
-    | Modifiers CLASS Identifier ClassBody
-    | Modifiers CLASS Identifier Super ClassBody
+
+DeclaracionClase ::= CLASS Identificador CuerpoClase
+    | CLASS Identificador Super CuerpoClase
+    | Modificadores CLASS Identificador CuerpoClase
+    | Modificadores CLASS Identificador Super CuerpoClase
 ;
-ClassDeclarations ::= ClassDeclaration
-    | ClassDeclarations ClassDeclaration
+DeclaracionClases ::= DeclaracionClase
+    | DeclaracionClases DeclaracionClase
 ;
-Super ::= EXTENDS Name
+Super ::= EXTENDS Nombre
 ;
-ClassBody ::= LEFT_CURLY RIGHT_CURLY
-    | LEFT_CURLY ClassMemberDeclarations RIGHT_CURLY
+CuerpoClase ::= LEFT_CURLY RIGHT_CURLY
+    | LEFT_CURLY DeclaracionMiembrosdeClase RIGHT_CURLY
 ;
-ClassMemberDeclarations ::= ClassMemberDeclaration
-    | ClassMemberDeclarations ClassMemberDeclaration
+DeclaracionMiembrosdeClase ::= DeclaracionMiembrodeClase
+    | DeclaracionMiembrosdeClase DeclaracionMiembrodeClase
 ;
-ClassMemberDeclaration ::= FieldDeclaration
+DeclaracionMiembrodeClase ::= FieldDeclaration
     | MethodDeclaration
 ;
 
-FieldDeclaration ::= Modifiers Type IdentifierList SEMICOLON
-    | Type IdentifierList SEMICOLON
-    | Modifiers Type IdentifierList ASSIGNMENT Literal SEMICOLON
-    | Type IdentifierList ASSIGNMENT Literal SEMICOLON
+FieldDeclaration ::= Modificadores Tipo IdentificadorList SEMICOLON
+    | Tipo IdentificadorList SEMICOLON
+    | Modificadores Tipo IdentificadorList ASSIGNMENT Literal SEMICOLON
+    | Tipo IdentificadorList ASSIGNMENT Literal SEMICOLON
 ;
-IdentifierList ::= Identifier
-    | IdentifierList COMMA Identifier
+IdentificadorList ::= Identificador
+    | IdentificadorList COMMA Identificador
 ;
 
 MethodDeclaration ::= MethodHeader MethodBody
 ;
-MethodHeader ::= Type MethodDeclarator
-    | Type MethodDeclarator Throws
+MethodHeader ::= Tipo MethodDeclarator
+    | Tipo MethodDeclarator Throws
     | VOID MethodDeclarator
     | VOID MethodDeclarator Throws
 
-    | Modifiers Type MethodDeclarator
-    | Modifiers Type MethodDeclarator Throws
-    | Modifiers VOID MethodDeclarator
-    | Modifiers VOID MethodDeclarator Throws
+    | Modificadores Tipo MethodDeclarator
+    | Modificadores Tipo MethodDeclarator Throws
+    | Modificadores VOID MethodDeclarator
+    | Modificadores VOID MethodDeclarator Throws
 ;
-MethodDeclarator ::= Identifier LEFT RIGHT
-    | Identifier LEFT FormalParameterList RIGHT
+MethodDeclarator ::= Identificador LEFT RIGHT
+    | Identificador LEFT FormalParameterList RIGHT
 ;
 FormalParameterList ::= FormalParameter
     | FormalParameterList COMMA FormalParameter
 ;
-FormalParameter ::= Type Identifier
+FormalParameter ::= Tipo Identificador
 ;
-Throws ::= THROWS Name
+Throws ::= THROWS Nombre
 ;
 MethodBody ::= Block
     | SEMICOLON
 ;
-//***********************************************
-//Blocks and Statements
-//***********************************************
+
 Block ::= LEFT_CURLY RIGHT_CURLY
     | LEFT_CURLY BlockStatements RIGHT_CURLY
 ;
@@ -206,13 +187,13 @@ BlockStatements ::= BlockStatement
 ;
 LocalVariableDeclarationStatement ::= LocalVariableDeclaration SEMICOLON
 ;
-LocalVariableDeclaration ::= Type VariableDeclarators
+LocalVariableDeclaration ::= Tipo VariableDeclarators
 ;
 VariableDeclarators ::= VariableDeclarator
     | VariableDeclarators COMMA VariableDeclarator
 ;
-VariableDeclarator ::= Identifier
-    | Identifier ASSIGNMENT Expression
+VariableDeclarator ::= Identificador
+    | Identificador ASSIGNMENT Expression
 ;
 Statement ::= Block
     | ExpressionStatement
@@ -262,9 +243,7 @@ ForUpdate ::= StatementExpressionList
 StatementExpressionList ::= StatementExpression
     | StatementExpressionList COMMA StatementExpression
 ;
-//***********************************************
-//Expressions
-//***********************************************
+
 Expression ::= ConditionalExpression
     | AssignmentExpression
 ;
@@ -298,6 +277,7 @@ PrefixOp ::= MINUS
 ;
 PostfixExpression ::= Primary
     | Primary Suffixs
+    | Nombre | Nombre Suffixs
 ;
 Suffixs ::= Suffix
     | Suffixs Suffix
@@ -305,13 +285,13 @@ Suffixs ::= Suffix
 Suffix ::= ArrayAccess
     | FieldAccess
     | MethodInvocation
-    | Name
+    | Nombre
     | INCREMENT
     | DECREMENT
 ;
 ArrayAccess ::= LEFT_BRACKET Expression RIGHT_BRACKET
 ;
-Selector ::= DOT Identifier
+Selector ::= DOT Identificador
 ;
 Selectors ::= Selector
     | Selectors Selector
@@ -329,29 +309,27 @@ ArgumentList ::= Expression
 Primary ::= LEFT Expression RIGHT
     | THIS
     | Literal
-    | Name
     | SUPER FieldAccess
     | SUPER MethodInvocation
     | ClassInstanceCreationExpression
     | ArrayCreationExpression
 ;
-ClassInstanceCreationExpression ::= NEW Name LEFT RIGHT
-    | NEW Name LEFT ArgumentList RIGHT
+ClassInstanceCreationExpression ::= NEW Nombre LEFT RIGHT
+    | NEW Nombre LEFT ArgumentList RIGHT
 ;
-ArrayCreationExpression ::= NEW PrimitiveType LEFT_BRACKET Expression RIGHT_BRACKET
-    | NEW PrimitiveType LEFT_BRACKET Expression RIGHT_BRACKET Dimensions
-    | NEW Name LEFT_BRACKET Expression RIGHT_BRACKET
-    | NEW Name LEFT_BRACKET Expression RIGHT_BRACKET Dimensions
+ArrayCreationExpression ::= NEW TipoPrimitivo LEFT_BRACKET Expression RIGHT_BRACKET
+    | NEW TipoPrimitivo LEFT_BRACKET Expression RIGHT_BRACKET Dimensions
+    | NEW Nombre LEFT_BRACKET Expression RIGHT_BRACKET
+    | NEW Nombre LEFT_BRACKET Expression RIGHT_BRACKET Dimensions
 ;
 Dimension ::= LEFT_BRACKET RIGHT_BRACKET
+    | LEFT_BRACKET Expression RIGHT_BRACKET
 ;
 Dimensions ::= Dimension
     | Dimensions Dimension
 ;
-//***********************************************
-//Lexical Structure
-//***********************************************
-Identifier ::= IDENTIFIER
+
+Identificador ::= IDENTIFIER
 ;
 Literal ::= INTEGER_LITERAL
     | FLOATING_POINT_LITERAL
@@ -360,6 +338,6 @@ Literal ::= INTEGER_LITERAL
     | STRING_LITERAL
     | NULL_LITERAL
 ;
-ReferenceType ::= Name
-    | ArrayType
+ReferenciaTipo ::= Nombre
+    | TipoArreglo
 ;
